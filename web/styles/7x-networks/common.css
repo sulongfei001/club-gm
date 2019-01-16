@@ -1,0 +1,51 @@
+.k-loading-mask{
+    display: none;
+}
+.k-detail-cell div {
+    background-color: unset;
+}
+
+.grid-logo {
+    display: inline-block;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-size: 35px 35px;
+    background-position: center center;
+    vertical-align: middle;
+    line-height: 35px;
+    box-shadow: inset 0 0 1px #999, inset 0 0 10px rgba(0, 0, 0, .2);
+    cursor: pointer;
+    margin: 0 2px;
+}
+.wrapper .photo {
+    float: left;
+    position: relative;
+    margin: 10px 10px 10px 10px;
+    padding: 0;
+}
+
+.photo .cancel {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    z-index: 9;
+    line-height: 20px;
+    float: right;
+    text-align: center;
+    background-color: white;
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.photo img {
+    height: 110px;
+}
+
+.wrapper:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}

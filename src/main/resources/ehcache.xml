@@ -1,0 +1,16 @@
+<ehcache>
+    <!--  maxElementsInMemory="10000" 缓存中最大允许创建的对象数 -->
+    <!-- eternal="false" 缓存中对象是否为永久的，如果是，超时设置将被忽略，对象从不过期 -->
+    <!-- timeToIdleSeconds="120" 缓存数据钝化时间(设置对象在它过期之前的空闲时间) -->
+    <!--  timeToLiveSeconds="120" 缓存数据的生存时间(设置对象在它过期之前的生存时间) -->
+    <!--  overflowToDisk="true" 内存不足时，是否启用磁盘缓存 -->
+
+    <defaultCache
+            maxElementsInMemory="100000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="false"
+            memoryStoreEvictionPolicy="FIFO"
+    />
+</ehcache>

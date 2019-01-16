@@ -1,0 +1,82 @@
+<form id="form" autocomplete="off" onsubmit="return false">
+    <div class="ht_r_div1">
+        <ul>
+            <li class="ht_r_bt font_18 color_2 pa_dd">商品编辑</li>
+            <li class="pa_dd ">
+                <div class="ht_block">
+                    <label class="required" for="goodsId">商品ID</label>
+                    <input type="text" class="k-textbox " name="goodsId" id="goodsId" disabled/>
+                </div>
+                <div class="ht_block">
+                    <label class="required" for="goodsName">商品名称</label>
+                    <input type="text" class="k-textbox " name="goodsName" id="goodsName" required data-message="商品名称为空"
+                           placeholder="输入商品名称"/>
+                </div>
+                <div class="ht_block">
+                    <label class="required" for="goodsType">商品类型</label>
+                    <input name="goodsType" id="goodsType" placeholder="选择商品类型"/>
+                </div>
+                <div class="ht_block">
+                    <label class="required" for="goodsPrdValueMon">商品价值</label>
+                    <input name="goodsPrdValueMon" id="goodsPrdValueMon" placeholder="输入商品价值"/>
+                </div>
+                <div class="ht_block">
+                    <label class="required" for="orderNum">排序号</label>
+                    <input name="orderNum" id="orderNum" placeholder="由小上下大"/>
+                </div>
+            </li>
+            <li class="ht_r_aniu text_center pa_dd">
+                <button id="update" type="button" class="k-primary k-button">更新</button>
+                <button id="cancle" type="button" class="k-button">取消</button>
+            </li>
+        </ul>
+    </div>
+</form>
+
+<script>
+    var Form = initForm('form');
+    $("#orderNum").kendoNumericTextBox({decimals: 0, format: "#"});
+    $("#goodsPrdValueMon").kendoNumericTextBox({decimals: 2, format: "#.##"});
+
+    (function () {
+        $("#goodsType").kendoDropDownList({
+            dataValueField: "id",
+            dataTextField: "name",
+            dataSource: [{id: 1, name: "类型一"}, {id: 2, name: "类型二"}],
+            optionLabel: {id: "", name: "请选择类型"}
+        });
+        get("goods/" + goods.id, function (res) {
+            $("#goodsId").val(res.goodsId);
+            $("#goodsName").val(res.goodsName);
+            $("#goodsPrdValueMon").data("kendoNumericTextBox").value(res.goodsPrdValueMon);
+            $("#goodsType").data("kendoDropDownList").value(res.goodsType);
+            $("#orderNum").data("kendoNumericTextBox").value(res.orderNum);
+        });
+    })();
+
+    $("#cancle").kendoButton({
+        click: function (e) {
+            loadPage('goods/list.html', 'a_goods');
+        }
+    });
+    $("#update").kendoButton({
+        click: function (e) {
+            e.preventDefault();
+            var validator = Form.data("kendoValidator");
+            if (validator.validate()) {
+                var data = {
+                    goodsType: $("#goodsType").val(),
+                    goodsName: $("#goodsName").val(),
+                    goodsPrdValueMon: $("#goodsPrdValueMon").val(),
+                    orderNum: $("#orderNum").val()
+                };
+                put("goods/" + goods.id, JSON.stringify(data), function () {
+                    layer.msg("更新成功！");
+                    loadPage("goods/list.html", "a_goods");
+                })
+            }
+        }
+    });
+
+
+</script>

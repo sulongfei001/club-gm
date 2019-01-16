@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理系统</title>
+    <!--<link href="../image/favicon.ico" rel="shortcut icon">-->
+    <link rel="stylesheet" href="../styles/kendo/kendo.common-bootstrap.min.css"/>
+    <link rel="stylesheet" href="../styles/kendo/kendo.bootstrap.min.css"/>
+    <link rel="stylesheet" href="../styles/kendo/kendo.bootstrap.mobile.min.css"/>
+    <link rel="stylesheet" href="../styles/kendo/kendo.dataviz.min.css"/>
+    <link rel="stylesheet" href="../styles/kendo/kendo.dataviz.bootstrap.min.css"/>
+    <link rel="stylesheet" href="../styles/bootstrap.min.css"/>
+    <link href="../styles/7x-networks/index.css" rel="stylesheet" type="text/css"/>
+    <link href="../styles/7x-networks/common.css" rel="stylesheet" type="text/css"/>
+
+
+    <script src="../js/kendo/jquery.min.js"></script>
+    <script src="../js/kendo/kendo.all.min.js"></script>
+    <script src="../js/kendo/messages/kendo.messages.zh-CN.min.js"></script>
+    <script src="../js/kendo/cultures/kendo.culture.zh-CN.min.js"></script>
+    <script src="../js/kendo/kendo.timezones.min.js"></script>
+    <script type="text/javascript" src="../js/jquery/jquery.md5.js"></script>
+    <script type="text/javascript" src="../js/jquery/jquery.form.js"></script>
+    <script type="text/javascript" src="../js/jquery/jquery.cookie.js"></script>
+    <script type="text/javascript" src="../js/7x-networks/area.js"></script>
+    <script type="text/javascript" src="../js/7x-networks/restful.js"></script>
+    <script type="text/javascript" src="../js/7x-networks/main.js"></script>
+    <script type="text/javascript" src="../js/7x-networks/validate.js"></script>
+    <script type="text/javascript" src="../js/7x-networks/menu.js"></script>
+    <script type="text/javascript" src="../js/7x-networks/layer/layer.js"></script>
+
+</head>
+
+<body class="of_hiden">
+<section class="header color_huiback">
+    <!--<div class="f_l"><img src="../image/logo.png" width="188px" height="55px" class="mg_top5p"></div>-->
+    <div class="f_r user-info">
+        <ul>
+            <li class="font_18 ztcolor_b">欢迎您！<span id="username"></span></li>
+            <li class="user_ri">
+                <div class="user_tx">
+                    <img src="../image/22.png" width="44" height="44">
+                    <i class="ht_xz"><img src="../image/lg-arrow.png"></i>
+                    <div class="user_xq">
+                        <div class="text_center"><img src="../image/22.png" width="60" height="60"></div>
+                        <a style="background-image:url(../image/indextc_1.png)" href="javascript:logout();"
+                           data-img="indextc"><span>注销</span></a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</section>
+
+<!--内容-->
+<section class="ht_cont">
+    <!--左侧菜单-->
+    <section class="ht_cont_l f_l" id="menu">
+        <dl>
+            <dd>
+                <div class="cont_kz color_caid1 cont_mul">
+                    <a class="cont_nt"><span
+                            class="ztcolor_b">管理菜单</span></a>
+                    <i class="ht_xz1"><img src="../image/index_3.png"></i>
+                </div>
+                <div>
+                    <div class="cont_kz ht_cont_suml">
+                        <a id="a_dictionary" class="cont_nt"
+                           href="javascript:loadPage('dictionary/list.html', 'a_dictionary');">
+                            <span class="ztcolor_b">全局配置列表</span>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <div class="cont_kz ht_cont_suml">
+                        <a id="a_bar" class="cont_nt"
+                           href="javascript:loadPage('bar/list.html', 'a_bar');">
+                            <span class="ztcolor_b">酒吧列表管理</span>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <div class="cont_kz ht_cont_suml">
+                        <a id="a_goods" class="cont_nt"
+                           href="javascript:loadPage('goods/list.html', 'a_goods');">
+                            <span class="ztcolor_b">商品列表管理</span>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <div class="cont_kz ht_cont_suml">
+                        <a id="a_activity" class="cont_nt"
+                           href="javascript:loadPage('activity/list.html', 'a_activity');">
+                            <span class="ztcolor_b">活动列表管理</span>
+                        </a>
+                    </div>
+                </div>
+            </dd>
+            <dd>
+                <div class="cont_kz color_caid1 cont_mul">
+                    <a class="cont_nt"><span
+                            class="ztcolor_b">数据统计</span></a>
+                    <i class="ht_xz1"><img src="../image/index_3.png"></i>
+                </div>
+                <div>
+                    <div class="cont_kz ht_cont_suml">
+                        <a id="a_day" class="cont_nt"
+                           href="javascript:loadPage('statistics/day.html', 'a_day');">
+                            <span class="ztcolor_b">酒吧统计</span>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <div class="cont_kz ht_cont_suml">
+                        <a id="a_history_activity" class="cont_nt"
+                           href="javascript:loadPage('statistics/activity.html', 'a_history_activity');">
+                            <span class="ztcolor_b">历史活动</span>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <div class="cont_kz ht_cont_suml">
+                        <a id="a_user" class="cont_nt"
+                           href="javascript:loadPage('statistics/user.html', 'a_user');">
+                            <span class="ztcolor_b">用户数据</span>
+                        </a>
+                    </div>
+                </div>
+            </dd>
+        </dl>
+    </section>
+    <div class="ht_cont_jt" clk="0"><img src="../image/index_9.png"></div>
+    <!--右详情-->
+    <section id="content" class="ht_cont_r f_r"></section>
+    <div class="text_center ht_cont_bot">
+
+    </div>
+</section>
+
+<div id="ht_progressbar"><img src="../image/indeterminate.gif"></div>
+<section class="ht_tk_zg"></section>
+<script type="text/javascript" src="../js/7x-networks/index.js"></script>
+<script>
+    $(document).ready(
+        function () {
+            $("#username").text($.cookie(USER_NAME));
+            loadPage('dictionary/list.html', 'a_dictionary');
+        }
+    );
+</script>
+
+</body>
+</html>

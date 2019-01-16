@@ -1,0 +1,123 @@
+<form id="form" autocomplete="off" onsubmit="return false">
+    <div class="ht_r_div1">
+        <ul>
+            <li class="ht_r_bt font_18 color_2 pa_dd">活动配置</li>
+            <li class="pa_dd ">
+                <div class="ht_block">
+                    <label class="required" for="count">活动总量</label>
+                    <input type="text" class="k-textbox " name="count" id="count" style="width: 180px;" disabled/>
+                </div>
+                <div class="ht_block">
+                    <label class="required" for="saleCount">卖出数量</label>
+                    <input type="text" class="k-textbox " name="saleCount" id="saleCount" style="width: 180px;"
+                           disabled/>
+                </div>
+                <div class="ht_block">
+                    <label class="required" for="cellPhone">指定中奖人</label>
+                    <input type="text" class="k-textbox " name="cellPhone" id="cellPhone" style="width: 180px;"
+                           placeholder="请输入中奖人手机号"/>
+                </div>
+            </li>
+            <li class="ht_r_bt font_18 color_2 pa_dd2">用户数据</li>
+            <li class="grid-li">
+                <div id="grid"></div>
+            </li>
+            <li class="ht_r_aniu text_center pa_dd">
+                <button id="update" type="button" class="k-primary k-button">提交</button>
+                <button id="cancle" type="button" class="k-button">取消</button>
+            </li>
+        </ul>
+    </div>
+</form>
+
+<script>
+    var Form = initForm('form');
+    var loadGrid = function (dataSource) {
+        var KendoGrid = $("#grid").kendoGrid({
+            dataSource: {
+                data: dataSource,
+                schema: {
+                    model: {
+                        fields: {
+                            userName: {type: "string"},
+                            activityName: {type: "string"},
+                            goodsName: {type: "string"},
+                            tradeCount: {type: "number"},
+                            tradeDate: {type: "date"}
+                        }
+                    }
+                },
+                serverFiltering: false,
+                pageSize: 10
+            },
+            filterable: false,
+            sortable: true,
+            pageable: true,
+            scrollable: false,
+            selectable: "multiple cell",
+            editable: 'inline',
+            noRecords: {
+                template: "无记录"
+            },
+            columns: [
+                {
+                    field: "userName",
+                    title: "用户昵称",
+                    filterable: false
+                },
+                {
+                    field: "activityName",
+                    title: "活动名称",
+                    filterable: false
+                },
+                {
+                    field: "goodsName",
+                    title: "商品名称",
+                    filterable: false
+                },
+                {
+                    field: "tradeCount",
+                    title: "购买数量",
+                    filterable: false
+                },
+                {
+                    field: "tradeDate",
+                    title: "购买时间",
+                    filterable: false,
+                    format: "{0:yyyy-MM-dd HH:mm:ss}"
+                }
+            ]
+
+        });
+        kendoWidgets.push(KendoGrid.data("KendoGrid"));
+    };
+    (function () {
+        get("activity/" + activity.id + "/config", function (res) {
+            $("#count").val(res.count);
+            $("#saleCount").val(res.saleCount);
+            loadGrid(res.orderVos);
+        });
+    })();
+
+
+    $("#cancle").kendoButton({
+        click: function (e) {
+            loadPage('activity/list.html', 'a_activity');
+        }
+    });
+    $("#update").kendoButton({
+        click: function (e) {
+            e.preventDefault();
+            var validator = Form.data("kendoValidator");
+            if (validator.validate()) {
+                var data = {};
+                var cellPhone = $("#cellPhone").val();
+                if (cellPhone == "") return;
+                put("activity/" + activity.id + "/config?cellPhone=" + cellPhone, JSON.stringify(data), function () {
+                    layer.msg("配置成功！");
+                });
+            }
+        }
+    });
+
+</script>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <!--<link href="../image/favicon.ico" rel="shortcut icon">-->
+    <meta name="renderer" content="webkit">
+    <title>欢迎登陆后台管理系统</title>
+    <link href="../styles/7x-networks/loginbase.css" rel="stylesheet" type="text/css"/>
+    <link href="../styles/7x-networks/logincont.css" rel="stylesheet" type="text/css"/>
+    <script src="../js/kendo/jquery.min.js"></script>
+    <script src="../js/kendo/kendo.all.min.js"></script>
+    <script type="text/javascript" src="../js/jquery/jquery.md5.js"></script>
+    <script type="text/javascript" src="../js/jquery/jquery.cookie.js"></script>
+    <script type="text/javascript" src="../js/7x-networks/restful.js"></script>
+    <script type="text/javascript" src="../js/7x-networks/validate.js"></script>
+    <script type="text/javascript" src="../js/7x-networks/layer/layer.js"></script>
+    <script type="text/javascript" src="../js/7x-networks/nicescroll.js"></script>
+    <script type="text/javascript" src="../js/7x-networks/login.js"></script>
+</head>
+
+<body>
+<div class="qixLogin">
+    <div class="gray-bg"></div>
+    <div class="load-bar">
+        <div class="load-bg"></div>
+    </div>
+    <div class="logo"><img src="../image/login_logo.png" width="300px" height="145px"/></div>
+    <div class="box-hidden">
+        <div class="box-wrap">
+            <div class="box" id="accountBox">
+                <div class="inner">
+                    <div class="title"><strong>登录</strong>
+                        <p>使用帐号登录</p>
+                    </div>
+                    <div class="textbox">
+                        <div class="text-tit">账户</div>
+                        <i class="line"></i> <i class="lined"></i>
+                        <input id='txtEmail' type="text" value="">
+                    </div>
+                    <div class="textbox" style="margin-top: 30px;">
+                        <div class="text-tit">密码</div>
+                        <i class="line"></i> <i class="lined"></i>
+                        <input id='txtPassword1' type="password" value="">
+                    </div>
+                    <div class="operate">
+                        <div class="ta-center t-c">
+                            <input name="" type="button" value="登录" onClick="login()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+<div class="qixLoginBg"><img src="../image/201705152137.jpg"/></div>
+<div class="copyright"></div>
+
+<script>
+    function login() {
+        var username = $("#txtEmail").val();
+        var password = $("#txtPassword1").val();
+        if (username == "") {
+            $("#txtEmail").focus();
+            layer.msg("账户不能为空！");
+            return;
+        }
+        if (password == "") {
+            $("#txtPassword1").focus();
+            layer.msg("密码不能为空！");
+            return;
+        }
+        layer.msg("登录中");
+        setTimeout(function () {
+            password = $.md5($.md5(password));
+            generateToken(username, password);
+        }, 500);
+    }
+</script>
+
+</body>
+</html>

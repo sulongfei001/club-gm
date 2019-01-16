@@ -1,0 +1,156 @@
+<form id="form" autocomplete="off" onsubmit="return false">
+    <div class="ht_r_div1">
+        <ul>
+            <li class="ht_r_bt font_18 color_2 pa_dd">每日统计</li>
+            <li class="pa_dd ">
+                <div class="ht_row">
+                    <label class="required" for="day">选择日期</label>
+                    <input name="day" id="day" onchange="dayChange()"/>
+                </div>
+            </li>
+            <li class="grid-li">
+                <div id="gridDay"></div>
+            </li>
+            <li class="ht_r_bt font_18 color_2 pa_dd">每月统计</li>
+            <li class="pa_dd ">
+                <div class="ht_row">
+                    <label class="required" for="month">选择日期</label>
+                    <input name="month" id="month" onchange="monthChange()"/>
+                </div>
+            </li>
+            <li class="grid-li">
+                <div id="gridMonth"></div>
+            </li>
+        </ul>
+    </div>
+</form>
+
+<script>
+    $("#day").kendoDatePicker({culture: "zh-CN", format: "yyyy-MM-dd"});
+    $("#month").kendoDatePicker({culture: "zh-CN", format: "yyyy-MM"});
+    var loadGridDay = function (dataSource) {
+        var KendoGrid = $("#gridDay").kendoGrid({
+            dataSource: {
+                data: dataSource,
+                schema: {
+                    model: {
+                        fields: {
+                            barName: {type: "string"},
+                            payCount: {type: "number"},
+                            userCount: {type: "number"},
+                            income: {type: "number"}
+                        }
+                    }
+                },
+                serverFiltering: false,
+                pageSize: 10
+            },
+            filterable: false,
+            sortable: true,
+            pageable: true,
+            scrollable: false,
+            selectable: "multiple cell",
+            editable: 'inline',
+            noRecords: {
+                template: "无记录"
+            },
+            columns: [
+                {
+                    field: "barName",
+                    title: "酒吧名称",
+                    filterable: false
+                },
+                {
+                    field: "payCount",
+                    title: "付费次数",
+                    filterable: false
+                },
+                {
+                    field: "userCount",
+                    title: "付费人数",
+                    filterable: false
+                },
+                {
+                    field: "income",
+                    title: "总收入",
+                    filterable: false
+                }
+            ]
+
+        });
+        kendoWidgets.push(KendoGrid.data("KendoGrid"));
+    };
+
+    var loadGridMonth = function (dataSource) {
+        var KendoGrid = $("#gridMonth").kendoGrid({
+            dataSource: {
+                data: dataSource,
+                schema: {
+                    model: {
+                        fields: {
+                            barName: {type: "string"},
+                            payCount: {type: "number"},
+                            userCount: {type: "number"},
+                            income: {type: "number"}
+                        }
+                    }
+                },
+                serverFiltering: false,
+                pageSize: 10
+            },
+            filterable: false,
+            sortable: true,
+            pageable: true,
+            scrollable: false,
+            selectable: "multiple cell",
+            editable: 'inline',
+            noRecords: {
+                template: "无记录"
+            },
+            columns: [
+                {
+                    field: "barName",
+                    title: "酒吧名称",
+                    filterable: false
+                },
+                {
+                    field: "payCount",
+                    title: "付费次数",
+                    filterable: false
+                },
+                {
+                    field: "userCount",
+                    title: "付费人数",
+                    filterable: false
+                },
+                {
+                    field: "income",
+                    title: "总收入",
+                    filterable: false
+                }
+            ]
+
+        });
+        kendoWidgets.push(KendoGrid.data("KendoGrid"));
+    };
+
+    function dayChange() {
+        var day = kendo.timezone.apply(new Date($("#day").val()), "Etc/GMT-8").getTime();
+        var data = {
+            day: day
+        };
+        patch("bar/statistics", JSON.stringify(data), function (res) {
+            loadGridDay(res);
+        });
+    }
+
+    function monthChange() {
+        var month = kendo.timezone.apply(new Date($("#month").val()), "Etc/GMT-8").getTime();
+        var data = {
+            month: month
+        };
+        patch("bar/statistics", JSON.stringify(data), function (res) {
+            loadGridMonth(res);
+        });
+    }
+</script>

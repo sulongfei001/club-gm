@@ -1,0 +1,103 @@
+<div class="ht_r_div1">
+    <ul>
+        <li class="ht_r_bt font_18 color_2 pa_dd2">全局配置列表</li>
+        <li class="grid-li">
+            <div id="grid"></div>
+        </li>
+    </ul>
+</div>
+<script>
+    var loadDicGrid = function () {
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: function (options) {
+                    get("dictionaries", function (res) {
+                        options.success(res);
+                    });
+                },
+                update: function (options) {
+                    var data = {
+                        key: options.data.key,
+                        value: options.data.value,
+                        remark: options.data.remark
+                    };
+                    put("dictionaries/" + options.data.id, JSON.stringify(data), function (res) {
+                        options.success(res);
+                        loadPage("dictionary/list.html", "a_dictionary");
+                        layer.msg("修改成功！");
+                    }, function (res) {
+                        layer.msg(res.message);
+                        var grid = $("#grid").data("kendoGrid");
+                        grid.cancelChanges();
+                    });
+                },
+                parameterMap: function (options, operation) {
+                    if (operation !== "read" && options.models) {
+                        return {models: kendo.stringify(options.models)};
+                    }
+                }
+            },
+            schema: {
+                model: {
+                    id: "id",
+                    fields: {
+                        id: {type: "number"},
+                        key: {type: "string", editable: false},
+                        value: {type: "string", validation: {required: true}},
+                        remark: {type: "string", validation: {required: true}}
+                    }
+                }
+            },
+            serverFiltering: false,
+            pageSize: 20
+        });
+        var dicKendoGrid = $("#grid").kendoGrid({
+            filterable: {mode: "row"},
+            dataSource: dataSource,
+            editable: 'inline',
+            sortable: true,
+            pageable: true,
+            allowCopy: true,
+            selectable: "multiple cell",
+            scrollable: false,
+            noRecords: {
+                template: "无记录"
+            },
+            toolbar: [
+                {
+                    template: '<a class="k-button k-button-icontext" href="javascript:loadPage(\'dictionary/list.html\',\'a_dictionary\');" ><span class="k-icon k-i-reload"></span>刷新</a>'
+                }
+
+            ],
+            columns: [
+                {
+                    field: "key",
+                    filterable: false
+                },
+                {
+                    field: "value",
+                    filterable: false
+                },
+                {
+                    field: "remark",
+                    title: "备注",
+                    filterable: false
+                },
+                {
+                    width: "120px",
+                    title: "操作",
+                    filterable: false,
+                    command: [
+                        {
+                            name: "edit"
+                        }
+                    ]
+                }
+            ]
+
+        });
+
+        kendoWidgets.push(dicKendoGrid.data("kendoGrid"));
+    };
+    loadDicGrid();
+</script>

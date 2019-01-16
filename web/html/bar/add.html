@@ -1,0 +1,102 @@
+<form id="form" autocomplete="off" onsubmit="return false">
+    <div class="ht_r_div1">
+        <ul>
+            <li class="ht_r_bt font_18 color_2 pa_dd">酒吧新增</li>
+            <li class="pa_dd ">
+                <div class="ht_block">
+                    <label class="required" for="name">酒吧名称</label>
+                    <input type="text" class="k-textbox " name="name" id="name" required data-message="酒吧名称为空" placeholder="输入酒吧名称"/>
+                </div>
+                <div class="ht_block">
+                    <label class="required" for="orderNum">排序号</label>
+                    <input name="orderNum" id="orderNum" placeholder="由小上下大"/>
+                </div>
+                <div class="ht_row">
+                    <label class="required" for="file">酒吧图片</label>
+                </div>
+                <div class="ht_row">
+                    <input name="file" id="file" type="file"/>
+                </div>
+                <div class="ht_row">
+                    <div id="imgContent" class="wrapper"></div>
+                </div>
+            </li>
+            <li class="ht_r_aniu text_center pa_dd">
+                <button id="update" type="button" class="k-primary k-button">提交</button>
+                <button id="cancle" type="button" class="k-button">取消</button>
+            </li>
+        </ul>
+    </div>
+</form>
+
+<script>
+    var Form = initForm('form');
+    var img = [];
+    $("#orderNum").kendoNumericTextBox({decimals: 0, format: "#"});
+
+    $("#file").kendoUpload({
+        async: {
+            saveUrl: appendAccessTokenAfterUrl(host + "image_uploading"),
+            autoUpload: true,
+            batch: false
+        },
+        validation: {
+            allowedExtensions: [".jpg", ".jpeg", ".png", ".bmp", ".gif"]
+        },
+        success: onSuccessFile,
+        error: function () {
+            layer.msg("文件上传失败！");
+        },
+        showFileList: false
+    });
+
+    function onSuccessFile(e) {
+        if (e.operation == "upload") {
+            for (var i = 0; i < e.files.length; i++) {
+                var file = e.files[i].rawFile;
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onloadend = function () {
+                        var rand = -Math.floor(Math.random() * 100000000000);
+                        $("<div class=\"photo\"><div class=\"cancel\" onclick=\"deletePhoto(this," + rand + ");\"><b>X</b></div><img src=" + this.result + " /></div>").appendTo($("#imgContent"));
+                        img.push({key: rand, value: e.response.tmpFileName});
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+    }
+
+
+    $("#cancle").kendoButton({
+        click: function (e) {
+            loadPage('bar/list.html', 'a_bar');
+        }
+    });
+    $("#update").kendoButton({
+        click: function (e) {
+            e.preventDefault();
+            var validator = Form.data("kendoValidator");
+            if (validator.validate()) {
+                var imgStr = "";
+                $.each(img, function (index, value) {
+                    if (index == 0) {
+                        imgStr = value.value;
+                    } else {
+                        imgStr = imgStr + "," + value.value;
+                    }
+                });
+                var data = {
+                    name: $("#name").val(),
+                    orderNum: $("#orderNum").val(),
+                    imgStr: imgStr
+                };
+                post("bar", JSON.stringify(data), function () {
+                    layer.msg("新增成功！");
+                    loadPage("bar/list.html", "a_bar");
+                });
+            }
+        }
+    });
+
+</script>

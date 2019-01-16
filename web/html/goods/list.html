@@ -1,0 +1,174 @@
+<div class="ht_r_div1">
+    <ul>
+        <li class="ht_r_bt font_18 color_2 pa_dd2">商品列表</li>
+        <li class="grid-li">
+            <div id="grid"></div>
+        </li>
+    </ul>
+</div>
+<style>
+    #grid label {
+        width: 20px;
+    }
+</style>
+<script>
+    var goods = [];
+    var dataSource = new kendo.data.DataSource({
+        transport: {
+            read: function (options) {
+                get("goods", function (res) {
+                    options.success(res);
+                });
+            },
+            parameterMap: function (options, operation) {
+                if (operation !== "read" && options.models) {
+                    return {models: kendo.stringify(options.models)};
+                }
+            }
+        },
+        schema: {
+            model: {
+                id: "id",
+                fields: {
+                    id: {type: "number"},
+                    goodsId: {type: "number"},
+                    goodsName: {type: "string"},
+                    orderNum: {type: "number"},
+                    state: {type: "number"}
+                }
+            }
+        },
+        serverFiltering: false,
+        pageSize: 20
+    });
+    var loadGrid = function () {
+        var KendoGrid = $("#grid").kendoGrid({
+            dataSource: dataSource,
+            persistSelection: true,
+            filterable: false,
+            sortable: true,
+            pageable: true,
+            scrollable: false,
+            noRecords: {
+                template: "无记录"
+            },
+            toolbar: [
+                {
+                    template: '<a class="k-button k-button-icontext" href="javascript:batchExamine(1);"><span class="k-icon k-i-edit"></span>通过</a>' +
+                        '<a class="k-button k-button-icontext" href="javascript:batchExamine(2);"><span class="k-icon k-i-edit"></span>拒绝</a>' +
+                        '<a class="k-button k-button-icontext" href="javascript:syncData();" ><span class="k-icon k-i-plus"></span>同步</a>' +
+                        '<a class="k-button k-button-icontext" href="javascript:loadPage(\'goods/list.html\',\'a_goods\');" ><span class="k-icon k-i-reload"></span>刷新</a>'
+                }
+
+            ],
+            columns: [
+                {
+                    selectable: true,
+                    width: "100px"
+                },
+                {
+                    field: "goodsId",
+                    title: "商品ID",
+                    filterable: false
+                },
+                {
+                    field: "goodsName",
+                    title: "商品名称",
+                    filterable: false
+                },
+                {
+                    field: "goodsPrdValueMon",
+                    title: "商品价格",
+                    filterable: false
+                },
+                {
+                    field: "state",
+                    title: "状态",
+                    filterable: false,
+                    template: function (dataItem) {
+                        switch (dataItem.state) {
+                            case 0:
+                                return "未审查";
+                            case 1:
+                                return "已通过";
+                            case 2:
+                                return "已拒绝";
+                            default:
+                                return "";
+                        }
+                    }
+                },
+                {
+                    field: "orderNum",
+                    title: "排序号",
+                    filterable: false
+                },
+                {
+                    width: "220px",
+                    title: "操作",
+                    filterable: false,
+                    command: [
+                        {
+                            text: "编辑",
+                            iconClass: "k-icon k-i-edit",
+                            click: function (e) {
+                                var tr = $(e.target).closest("tr");
+                                var data = this.dataItem(tr);
+                                goods.id = data.id;
+                                loadPage("goods/edit.html", "a_goods");
+                            }
+                        },
+                        {
+                            text: "删除",
+                            iconClass: "k-icon k-i-delete",
+                            click: function (e) {
+                                var tr = $(e.target).closest("tr");
+                                var data = this.dataItem(tr);
+                                removeOne(data.id);
+                            }
+                        }
+                    ]
+                }
+            ]
+
+        });
+        kendoWidgets.push(KendoGrid.data("kendoGrid"));
+    };
+
+    function removeOne(id) {
+        myConfirm("是否确定删除所选项？", function () {
+            del("goods/" + id, function () {
+                layer.msg("删除成功！");
+                loadPage("goods/list.html", "a_goods");
+            });
+        })
+    }
+
+    function batchExamine(result) {
+        var goodsIds = $("#grid").data("kendoGrid").selectedKeyNames();
+        var text = "";
+        if (result == 1) {
+            text = "您是否确定通过所选项?";
+        } else if (result == 2) {
+            text = "您是否确定拒绝所选项?";
+        }
+        if (goodsIds.length > 0) {
+            myConfirm(text, function () {
+                    put("goods/examine/" + result + "/" + goodsIds, JSON.stringify(""), function () {
+                        layer.msg("操作成功！");
+                        loadPage("goods/list.html", 'a_goods');
+                    });
+                }
+            )
+        }
+    }
+
+    function syncData() {
+        patch("bar/syncData", JSON.stringify(""), function (res) {
+            layer.msg("数据同步成功！");
+            dataSource.read();
+        });
+    }
+
+    loadGrid();
+</script>

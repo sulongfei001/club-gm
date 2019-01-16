@@ -1,0 +1,296 @@
+<form id="form" autocomplete="off" onsubmit="return false">
+    <div class="ht_r_div1">
+        <ul>
+            <li class="ht_r_bt font_18 color_2 pa_dd">活动编辑</li>
+            <li class="pa_dd ">
+                <div class="ht_block">
+                    <label class="required" for="name">活动名称</label>
+                    <input type="text" class="k-textbox " name="name" id="name" required data-message="活动名称为空"
+                           placeholder="输入活动名称" style="width: 180px;"/>
+                </div>
+                <div class="ht_block">
+                    <label class="required" for="barId">专享酒吧</label>
+                    <input name="barId" id="barId" style="width: 180px;"/>
+                </div>
+                <div class="ht_block">
+                    <label class="required" for="goodsId">商品列表</label>
+                    <input name="goodsId" id="goodsId" placeholder="请选择商品" required data-message="商品列表为空"
+                           style="width: 180px;"/>
+                </div>
+                <div class="ht_block">
+                    <label class="required" for="count">活动数量</label>
+                    <input name="count" id="count" style="width: 180px;" required data-message="活动数量为空"
+                           placeholder="输入活动数量"/>
+                </div>
+                <div class="ht_block">
+                    <label class="required" for="orderNum">排序号</label>
+                    <input name="orderNum" id="orderNum" style="width: 180px;" placeholder="由小上大下"/>
+                </div>
+                <div class="ht_block">
+                    <label class="required" for="startTime">开始时间</label>
+                    <input name="startTime" id="startTime" style="width: 180px;" required data-message="开始时间为空"
+                           placeholder="活动开始时间"/>
+                </div>
+                <div class="ht_block">
+                    <label class="required" for="endTime">结束时间</label>
+                    <input name="endTime" id="endTime" style="width: 180px;" required data-message="结束时间为空"
+                           placeholder="活动结束时间"/>
+                </div>
+                <div class="ht_row">
+                    <label class="required" for="textContent">文本说明</label>
+                    <textarea type="text" class="k-textbox " name="textContent" id="textContent"
+                              style="width: 585px;padding-left: 10px;" placeholder="在这里输入活动的文本说明。。。"></textarea>
+                </div>
+                <div class="ht_row">
+                    <label class="required" for="file">活动图片</label>
+                </div>
+                <div class="ht_row">
+                    <input name="file" id="file" type="file"/>
+                </div>
+                <div class="ht_row">
+                    <div id="imgContent" class="wrapper"></div>
+                </div>
+                <div class="ht_row">
+                    <label class="required" for="file">主页图片</label>
+                </div>
+                <div class="ht_row">
+                    <input name="file" id="file2" type="file"/>
+                    <input id="mainImg" name="mainImg" type="hidden">
+                </div>
+                <div class="ht_row">
+                    <div id="mainImgContent" class="wrapper"></div>
+                </div>
+                <div class="ht_row">
+                    <label class="required" for="file">缩略图片</label>
+                </div>
+                <div class="ht_row">
+                    <input name="file" id="file3" type="file"/>
+                    <input id="thumbImg" name="thumbImg" type="hidden">
+                </div>
+                <div class="ht_row">
+                    <div id="thumbImgContent" class="wrapper"></div>
+                </div>
+            </li>
+            <li class="ht_r_aniu text_center pa_dd">
+                <button id="update" type="button" class="k-primary k-button">更新</button>
+                <button id="cancle" type="button" class="k-button">取消</button>
+            </li>
+        </ul>
+    </div>
+</form>
+
+<script>
+    var Form = initForm('form');
+    var img = [];
+    var delImg = [];
+    $("#orderNum,#count").kendoNumericTextBox({decimals: 0, format: "#"});
+    $("#startTime").kendoDateTimePicker({culture: "zh-CN", format: "yyyy-MM-dd HH:mm:ss"});
+    $("#endTime").kendoDateTimePicker({culture: "zh-CN", format: "yyyy-MM-dd HH:mm:ss"});
+
+    (function () {
+        get("bar/pass", function (res) {
+            $("#barId").kendoDropDownList({
+                dataValueField: "barId",
+                dataTextField: "barName",
+                dataSource: res,
+                optionLabel: {barId: "", barName: "请选择酒吧"}
+            });
+        });
+        get("goods/pass", function (res) {
+            $("#goodsId").kendoDropDownList({
+                dataValueField: "goodsId",
+                dataTextField: "goodsName",
+                dataSource: res,
+                valueTemplate: "#:goodsName#：￥#:goodsPrdValueMon#",
+                template: "#:goodsName#：￥#:goodsPrdValueMon#",
+                optionLabel: {goodsId: "", goodsName: "请选择商品", goodsPrdValueMon: "", goodsType: ""}
+            });
+        });
+        get("activity/" + activity.id, function (res) {
+            $("#barId").data("kendoDropDownList").value(res.barId);
+            $("#goodsId").data("kendoDropDownList").value(res.goodsId);
+            $("#name").val(res.name);
+            $("#count").data("kendoNumericTextBox").value(res.count);
+            $("#orderNum").data("kendoNumericTextBox").value(res.orderNum);
+            $("#textContent").val(res.content);
+            $("#startTime").data("kendoDateTimePicker").value(res.startTime);
+            $("#endTime").data("kendoDateTimePicker").value(res.endTime);
+            $.each(res.snapshotVos, function (key, value) {
+                var html = "<div class=\"photo\"><div class=\"cancel\" onclick=\"deletePhoto1(this," + value.id + ");\"><b>X</b></div><img src=" + value.url + " /></div>";
+                if (value.type == 0) {
+                    $(html).appendTo($("#mainImgContent"));
+                } else if (value.type == 1) {
+                    $(html).appendTo($("#imgContent"));
+                } else if (value.type == 2) {
+                    $(html).appendTo($("#thumbImgContent"));
+                }
+            });
+        });
+    })();
+
+    $("#file").kendoUpload({
+        async: {
+            saveUrl: appendAccessTokenAfterUrl(host + "image_uploading"),
+            autoUpload: true,
+            batch: false
+        },
+        validation: {
+            allowedExtensions: [".jpg", ".jpeg", ".png", ".bmp", ".gif"]
+        },
+        success: onSuccessFile,
+        error: function () {
+            layer.msg("文件上传失败！");
+        },
+        showFileList: false
+    });
+
+    $("#file2").kendoUpload({
+        async: {
+            saveUrl: appendAccessTokenAfterUrl(host + "image_uploading"),
+            autoUpload: true,
+            batch: false
+        },
+        validation: {
+            allowedExtensions: [".jpg", ".jpeg", ".png", ".bmp", ".gif"]
+        },
+        success: onSuccessFile2,
+        error: function () {
+            layer.msg("文件上传失败！");
+        },
+        showFileList: false
+    });
+
+    $("#file3").kendoUpload({
+        async: {
+            saveUrl: appendAccessTokenAfterUrl(host + "image_uploading"),
+            autoUpload: true,
+            batch: false
+        },
+        validation: {
+            allowedExtensions: [".jpg", ".jpeg", ".png", ".bmp", ".gif"]
+        },
+        success: onSuccessFile3,
+        error: function () {
+            layer.msg("文件上传失败！");
+        },
+        showFileList: false
+    });
+
+    function onSuccessFile(e) {
+        if (e.operation == "upload") {
+            for (var i = 0; i < e.files.length; i++) {
+                var file = e.files[i].rawFile;
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onloadend = function () {
+                        var rand = -Math.floor(Math.random() * 100000000000);
+                        $("<div class=\"photo\"><div class=\"cancel\" onclick=\"deletePhoto2(this," + rand + ");\"><b>X</b></div><img src=" + this.result + " /></div>").appendTo($("#imgContent"));
+                        img.push({key: rand, value: e.response.tmpFileName});
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+    }
+
+    function onSuccessFile2(e) {
+        if (e.operation == "upload") {
+            for (var i = 0; i < e.files.length; i++) {
+                var file = e.files[i].rawFile;
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onloadend = function () {
+                        $("#mainImgContent").html("");
+                        $("<div class='photo'><img src=" + this.result + " /></div>").appendTo($("#mainImgContent"));
+                        $("#mainImg").val(e.response.tmpFileName);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+    }
+
+    function onSuccessFile3(e) {
+        if (e.operation == "upload") {
+            for (var i = 0; i < e.files.length; i++) {
+                var file = e.files[i].rawFile;
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onloadend = function () {
+                        $("#thumbImgContent").html("");
+                        $("<div class='photo'><img src=" + this.result + " /></div>").appendTo($("#thumbImgContent"));
+                        $("#thumbImg").val(e.response.tmpFileName);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+    }
+
+    function deletePhoto1(_element, rand) {
+        delImg.push(rand);
+        var _removeElement = _element.parentNode;
+        if (_removeElement) {
+            _removeElement.parentNode.removeChild(_removeElement);
+        }
+    }
+
+    function deletePhoto2(_element, rand) {
+        $.each(img, function (index, value) {
+            if (value.key == rand) {
+                img.splice(index, 1);
+                return false;
+            }
+        });
+        var _removeElement = _element.parentNode;
+        if (_removeElement) {
+            _removeElement.parentNode.removeChild(_removeElement);
+        }
+    }
+
+
+    $("#cancle").kendoButton({
+        click: function (e) {
+            loadPage('activity/list.html', 'a_activity');
+        }
+    });
+    $("#update").kendoButton({
+        click: function (e) {
+            e.preventDefault();
+            var validator = Form.data("kendoValidator");
+            if (validator.validate()) {
+                var imgStr = "";
+                $.each(img, function (index, value) {
+                    if (index == 0) {
+                        imgStr = value.value;
+                    } else {
+                        imgStr = imgStr + "," + value.value;
+                    }
+                });
+                var data = {
+                    name: $("#name").val(),
+                    barId: $("#barId").data("kendoDropDownList").value(),
+                    goodsId: $("#goodsId").data("kendoDropDownList").dataItem().goodsId,
+                    goodsName: $("#goodsId").data("kendoDropDownList").dataItem().goodsName,
+                    goodsType: $("#goodsId").data("kendoDropDownList").dataItem().goodsType,
+                    goodsPrdValueMon: $("#goodsId").data("kendoDropDownList").dataItem().goodsPrdValueMon,
+                    count: $("#count").val(),
+                    content: $("#textContent").val(),
+                    orderNum: $("#orderNum").val(),
+                    startTime: kendo.timezone.apply(new Date($("#startTime").val()), "Etc/GMT-8").getTime(),
+                    endTime: kendo.timezone.apply(new Date($("#endTime").val()), "Etc/GMT-8").getTime(),
+                    imgStr: imgStr,
+                    delImgStr: delImg.length == 0 ? "" : delImg.join(","),
+                    mainImg: $("#mainImg").val(),
+                    thumbImg: $("#thumbImg").val()
+                };
+                put("activity/" + activity.id, JSON.stringify(data), function () {
+                    layer.msg("更新成功！");
+                    loadPage("activity/list.html", "a_activity");
+                })
+            }
+        }
+    });
+
+
+</script>

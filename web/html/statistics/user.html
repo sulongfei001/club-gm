@@ -1,0 +1,123 @@
+<div class="ht_r_div1">
+    <ul>
+        <li class="ht_r_bt font_18 color_2 pa_dd2">用户数据</li>
+        <li class="grid-li">
+            <div id="grid"></div>
+        </li>
+    </ul>
+</div>
+<script>
+    var loadGrid = function () {
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: function (options) {
+                    get("order/userData", function (res) {
+                        options.success(res);
+                    });
+                },
+                parameterMap: function (options, operation) {
+                    if (operation !== "read" && options.models) {
+                        return {models: kendo.stringify(options.models)};
+                    }
+                }
+            },
+            schema: {
+                model: {
+                    id: "id",
+                    fields: {
+                        orderId: {type: "string"},
+                        activityName: {type: "string"},
+                        goodsName: {type: "string"},
+                        userName: {type: "string"},
+                        cellPhone: {type: "string"},
+                        createDate: {type: "date"},
+                        tradeDate: {type: "date"},
+                        tradeCount: {type: "number"},
+                        tradeMoney: {type: "number"},
+                        isWin: {type: "number"}
+                    }
+                }
+            },
+            serverFiltering: false,
+            pageSize: 20
+        });
+        var KendoGrid = $("#grid").kendoGrid({
+            dataSource: dataSource,
+            filterable: false,
+            sortable: true,
+            pageable: true,
+            scrollable: false,
+            selectable: "multiple cell",
+            editable: 'inline',
+            noRecords: {
+                template: "无记录"
+            },
+            columns: [
+                {
+                    field: "userName",
+                    title: "用户昵称",
+                    filterable: false
+                },
+                {
+                    field: "activityName",
+                    title: "活动名称",
+                    filterable: false
+                },
+                {
+                    field: "goodsName",
+                    title: "商品名称",
+                    filterable: false
+                },
+                {
+                    field: "orderId",
+                    title: "订单号",
+                    filterable: false
+                },
+                {
+                    field: "cellPhone",
+                    title: "用户手机号",
+                    filterable: false
+                },
+                {
+                    field: "createDate",
+                    title: "订单创建时间",
+                    filterable: false,
+                    format: "{0:yyyy-MM-dd HH:mm:ss}"
+
+                },
+                {
+                    field: "tradeDate",
+                    title: "支付时间",
+                    filterable: false,
+                    format: "{0:yyyy-MM-dd HH:mm:ss}"
+
+                },
+                {
+                    field: "tradeCount",
+                    title: "购买数量",
+                    filterable: false
+                },
+                {
+                    field: "tradeMoney",
+                    title: "支付金额",
+                    filterable: false
+                },
+                {
+                    title: "是否中奖",
+                    filterable: false,
+                    template: function (dataItem) {
+                        var html = "<span>未中奖</span>";
+                        if (dataItem.isWin == 1) {
+                            html = "<span style='color: red;'>中奖</span>";
+                        }
+                        return html;
+                    }
+                }
+            ]
+
+        });
+        kendoWidgets.push(KendoGrid.data("kendoGrid"));
+    };
+
+    loadGrid();
+</script>

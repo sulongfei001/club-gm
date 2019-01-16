@@ -1,0 +1,161 @@
+<div class="ht_r_div1">
+    <ul>
+        <li class="ht_r_bt font_18 color_2 pa_dd2">活动列表</li>
+        <li class="grid-li">
+            <div id="grid"></div>
+        </li>
+    </ul>
+</div>
+<script>
+    var activity = [];
+    var dataSource = new kendo.data.DataSource({
+        transport: {
+            read: function (options) {
+                get("activity", function (res) {
+                    options.success(res);
+                });
+            },
+            parameterMap: function (options, operation) {
+                if (operation !== "read" && options.models) {
+                    return {models: kendo.stringify(options.models)};
+                }
+            }
+        },
+        schema: {
+            model: {
+                id: "id",
+                fields: {
+                    id: {type: "number"},
+                    name: {type: "string"},
+                    orderNum: {type: "number"},
+                    startTime: {type: "date"},
+                    endTime: {type: "date"}
+                }
+            }
+        },
+        serverFiltering: false,
+        pageSize: 20
+    });
+    var loadGrid = function () {
+        var KendoGrid = $("#grid").kendoGrid({
+            dataSource: dataSource,
+            filterable: false,
+            sortable: true,
+            pageable: true,
+            scrollable: false,
+            selectable: "multiple cell",
+            editable: 'inline',
+            noRecords: {
+                template: "无记录"
+            },
+            toolbar: [
+                {
+                    template: '<a class="k-button k-button-icontext" href="javascript:loadPage(\'activity/add.html\',\'a_activity\');" ><span class="k-icon k-i-plus"></span>新增</a>' +
+                        '<a class="k-button k-button-icontext" href="javascript:loadPage(\'activity/list.html\',\'a_activity\');" ><span class="k-icon k-i-reload"></span>刷新</a>'
+                }
+
+            ],
+            columns: [
+                {
+                    field: "name",
+                    title: "活动名称",
+                    filterable: false
+                },
+                {
+                    field: "startTime",
+                    title: "开始时间",
+                    filterable: false,
+                    format: "{0:yyyy-MM-dd HH:mm:ss}"
+
+                },
+                {
+                    field: "endTime",
+                    title: "结束时间",
+                    filterable: false,
+                    format: "{0:yyyy-MM-dd HH:mm:ss}"
+
+                },
+                {
+                    field: "onSale",
+                    title: "活动状态",
+                    filterable: false,
+                    template: function (dataItem) {
+                        switch (dataItem.onSale) {
+                            case 0:
+                                return "<span style=\"color: red;\">下架</span>";
+                            case 1:
+                                return "<span style=\"color: green;\">上架</span>";
+                            default:
+                                return "";
+                        }
+                    }
+                },
+                {
+                    field: "orderNum",
+                    title: "排序号",
+                    filterable: false
+                },
+                {
+                    width: "380px",
+                    title: "操作",
+                    filterable: false,
+                    template: function (dataItem) {
+                        var id = dataItem.id;
+                        var onSaleHtml = '<a class="k-button k-button-icontext" href="javascript:onSaleOne(' + id + ',1);" ><span class="k-icon k-i-edit"></span>上架</a>';
+                        var offSaleHtml = '<a class="k-button k-button-icontext" href="javascript:onSaleOne(' + id + ',0);" ><span class="k-icon k-i-edit"></span>下架</a>';
+                        var editHtml = '<a class="k-button k-button-icontext" href="javascript:editOne(' + id + ');" ><span class="k-icon k-i-edit"></span>编辑</a>';
+                        var delHtml = '<a class="k-button k-button-icontext" href="javascript:removeOne(' + id + ');" ><span class="k-icon k-i-delete"></span>删除</a>';
+                        var confHtml = '<a class="k-button k-button-icontext" href="javascript:confiOne(' + id + ');" ><span class="k-icon k-i-edit"></span>配置</a>';
+                        if (dataItem.onSale == 0) {
+                            return onSaleHtml + editHtml + delHtml + confHtml;
+                        } else {
+                            return offSaleHtml + editHtml + delHtml + confHtml;
+                        }
+                    }
+                }
+            ]
+
+        });
+        kendoWidgets.push(KendoGrid.data("kendoGrid"));
+    };
+
+    function onSaleOne(id, onSale) {
+        var text = "";
+        if (onSale == 0) text = "是否确认活动下架？";
+        if (onSale == 1) text = "是否确认活动上架？";
+        myConfirm(text, function () {
+            put("activity/" + id + "/onSale?onSale=" + onSale, null, function () {
+                layer.msg("操作成功！");
+                dataSource.read();
+            });
+        });
+    }
+
+    function onSaleFn(id, onSale) {
+        put("activity/" + id + "/onSale?onSale=" + onSale, null, function () {
+            layer.msg("操作成功！");
+            dataSource.read();
+        });
+    }
+
+    function editOne(id) {
+        activity.id = id;
+        loadPage("activity/edit.html", "a_activity");
+    }
+
+    function confiOne(id) {
+        activity.id = id;
+        loadPage("activity/config.html", "a_activity");
+    }
+
+    function removeOne(id) {
+        myConfirm("是否确定删除所选项？", function () {
+            del("activity/" + id, function () {
+                layer.msg("删除成功！");
+                loadPage("activity/list.html", "a_activity");
+            });
+        })
+    }
+
+    loadGrid();
+</script>

@@ -1,0 +1,94 @@
+<div class="ht_r_div1">
+    <ul>
+        <li class="ht_r_bt font_18 color_2 pa_dd2">历史活动</li>
+        <li class="grid-li">
+            <div id="grid"></div>
+        </li>
+    </ul>
+</div>
+<script id="detail-template" type="text/x-kendo-template">
+    <div class="orders"></div>
+</script>
+<script>
+    var loadGrid = function () {
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: function (options) {
+                    get("activity/history", function (res) {
+                        options.success(res);
+                    });
+                },
+                parameterMap: function (options, operation) {
+                    if (operation !== "read" && options.models) {
+                        return {models: kendo.stringify(options.models)};
+                    }
+                }
+            },
+            schema: {
+                model: {
+                    id: "id",
+                    fields: {
+                        activityName: {type: "string"},
+                        income: {type: "number"},
+                        userVos: {type: "list"}
+                    }
+                }
+            },
+            serverFiltering: false,
+            pageSize: 20
+        });
+        var KendoGrid = $("#grid").kendoGrid({
+            dataSource: dataSource,
+            filterable: false,
+            sortable: true,
+            pageable: true,
+            scrollable: false,
+            selectable: "multiple cell",
+            editable: 'inline',
+            noRecords: {
+                template: "无记录"
+            },
+            detailTemplate: kendo.template($("#detail-template").html()),
+            detailInit: detailInit,
+            columns: [
+                {
+                    field: "activityName",
+                    title: "活动名称",
+                    filterable: false
+                },
+                {
+                    field: "income",
+                    title: "总收入(元)",
+                    filterable: false
+                },
+                {
+                    title: "中奖名单",
+                    filterable: false,
+                    template: function (dataItem) {
+                        return dataItem.userVos.length;
+                    }
+                }
+            ]
+
+        });
+        kendoWidgets.push(KendoGrid.data("kendoGrid"));
+    };
+
+    function detailInit(e) {
+        var detailRow = e.detailRow;
+        detailRow.find(".orders").kendoGrid({
+            dataSource: e.data.userVos,
+            scrollable: false,
+            selectable: "row",
+            columns: [
+                {field: "userName", title: "用户昵称", width: "110px"},
+                {field: "cellPhone", title: "用户手机", width: "110px"},
+                {field: "tradeCount", title: "购买数量", width: "70px"},
+                {field: "tradeMoney", title: "支付金额(元)", width: "70px"},
+                {field: "tradeDate", title: "支付时间", width: "70px"}
+            ]
+        });
+    }
+
+    loadGrid();
+</script>
